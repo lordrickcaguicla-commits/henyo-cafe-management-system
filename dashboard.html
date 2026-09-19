@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Henyo Cafe Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        background: var(--dashboard-bg);
+      }
+
+      .dashboard-shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: 260px;
+        background: var(--sidebar);
+        color: white;
+        padding: 28px 20px;
+      }
+
+      .sidebar .brand {
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .side-nav {
+        display: grid;
+        gap: 10px;
+      }
+
+      .side-nav a {
+        color: rgba(255,255,255,0.75);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+
+      .side-nav a.active,
+      .side-nav a:hover {
+        background: rgba(255,255,255,0.08);
+        color: white;
+      }
+
+      .content {
+        flex: 1;
+        padding: 28px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 28px;
+      }
+
+      .title h1 {
+        font-size: clamp(1.8rem, 2vw, 2.6rem);
+        margin: 0;
+      }
+
+      .user-pill {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 24px;
+      }
+
+      .panel {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: 0 18px 32px rgba(54, 37, 25, 0.05);
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+
+      .panel-header h3 {
+        margin: 0;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .kpi-card {
+        background: linear-gradient(180deg, #fffaf4, #fff);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px 16px;
+      }
+
+      .kpi-card small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .kpi-card strong {
+        font-size: 1.7rem;
+      }
+
+      .kpi-card .up {
+        color: var(--green);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .line-chart {
+        height: 220px;
+        display: flex;
+        align-items: end;
+        gap: 12px;
+        padding-top: 18px;
+      }
+
+      .line-chart span {
+        flex: 1;
+        border-radius: 10px 10px 0 0;
+        background: linear-gradient(180deg, #e7aa6d, #8a491f);
+        min-height: 20%;
+      }
+
+      .stack {
+        display: grid;
+        gap: 24px;
+      }
+
+      .sales-list,
+      .inventory-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .sales-list li,
+      .inventory-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(122,61,26,0.08);
+      }
+
+      .sales-list strong,
+      .inventory-list strong {
+        display: block;
+      }
+
+      .trend {
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .row-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      .table-status {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table-status th,
+      .table-status td {
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(122,61,26,0.08);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .badge.green {
+        background: rgba(78,139,99,0.12);
+        color: var(--green);
+      }
+
+      .badge.orange {
+        background: rgba(217,128,74,0.12);
+        color: var(--secondary);
+      }
+
+      .badge.red {
+        background: rgba(215,120,103,0.12);
+        color: #b75c4c;
+      }
+
+      @media (max-width: 900px) {
+        .dashboard-shell {
+          display: block;
+        }
+
+        .sidebar {
+          width: 100%;
+        }
+
+        .dashboard-grid,
+        .row-grid,
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">H</div>
+          <span>Henyo Cafe</span>
+        </div>
+
+        <nav class="side-nav" aria-label="Sidebar navigation">
+          <a class="active" href="#">Overview</a>
+          <a href="#">Orders</a>
+          <a href="#">Reservations</a>
+          <a href="#">Inventory</a>
+          <a href="#">Employees</a>
+          <a href="#">Analytics</a>
+          <a href="#">Reports</a>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <div class="topbar">
+          <div class="title">
+            <span class="eyebrow">Operations Dashboard</span>
+            <h1>Welcome back, Cafe Manager</h1>
+          </div>
+          <div class="user-pill">Today • 3 Jun 2026</div>
+        </div>
+
+        <section class="dashboard-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Revenue Overview</h3>
+              <span class="chip positive">+18.2% vs last week</span>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <small>Total sales</small>
+                <strong>₱128K</strong>
+                <div class="up">+8.5%</div>
+              </div>
+              <div class="kpi-card">
+                <small>Avg. ticket</small>
+                <strong>₱480</strong>
+                <div class="up">+6.1%</div>
+              </div>
+              <div class="kpi-card">
+                <small>Orders</small>
+                <strong>1,284</strong>
+                <div class="up">+12.4%</div>
+              </div>
+              <div class="kpi-card">
+                <small>Guests</small>
+                <strong>412</strong>
+                <div class="up">+9.7%</div>
+              </div>
+            </div>
+
+            <div class="line-chart" aria-label="Revenue trend chart">
+              <span style="height:42%"></span>
+              <span style="height:46%"></span>
+              <span style="height:52%"></span>
+              <span style="height:58%"></span>
+              <span style="height:67%"></span>
+              <span style="height:82%"></span>
+              <span style="height:76%"></span>
+              <span style="height:88%"></span>
+              <span style="height:96%"></span>
+              <span style="height:90%"></span>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Best Sellers</h3>
+                <span class="badge green">Top 5</span>
+              </div>
+              <ul class="sales-list">
+                <li>
+                  <div>
+                    <strong>Signature Latte</strong>
+                    <small>Hot Coffee</small>
+                  </div>
+                  <span class="trend">+24%</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>Caramel Cloud</strong>
+                    <small>Cold Brew</small>
+                  </div>
+                  <span class="trend">+18%</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>Truffle Pasta</strong>
+                    <small>Lunch Special</small>
+                  </div>
+                  <span class="trend">+12%</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3>Inventory Status</h3>
+                <span class="badge orange">12 items low</span>
+              </div>
+              <ul class="inventory-list">
+                <li>
+                  <div>
+                    <strong>Espresso Beans</strong>
+                    <small>Warehouse A</small>
+                  </div>
+                  <span class="badge red">Low</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>Milk</strong>
+                    <small>Cold Storage</small>
+                  </div>
+                  <span class="badge orange">Medium</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>Chocolate Syrup</strong>
+                    <small>Backroom</small>
+                  </div>
+                  <span class="badge green">Healthy</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="row-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Table Occupancy</h3>
+              <span class="badge green">82% occupied</span>
+            </div>
+
+            <table class="table-status">
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>Status</th>
+                  <th>Guests</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>T1</td>
+                  <td><span class="badge green">Occupied</span></td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td>T2</td>
+                  <td><span class="badge orange">Cleaning</span></td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>T5</td>
+                  <td><span class="badge green">Occupied</span></td>
+                  <td>4</td>
+                </tr>
+                <tr>
+                  <td>T7</td>
+                  <td><span class="badge red">Reserved</span></td>
+                  <td>3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Staff Performance</h3>
+              <span class="chip positive">Top performer</span>
+            </div>
+
+            <ul class="inventory-list">
+              <li>
+                <div>
+                  <strong>Angel</strong>
+                  <small>Barista</small>
+                </div>
+                <span class="trend">96 pts</span>
+              </li>
+              <li>
+                <div>
+                  <strong>Jessa</strong>
+                  <small>Cashier</small>
+                </div>
+                <span class="trend">91 pts</span>
+              </li>
+              <li>
+                <div>
+                  <strong>Marco</strong>
+                  <small>Kitchen</small>
+                </div>
+                <span class="trend">89 pts</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
